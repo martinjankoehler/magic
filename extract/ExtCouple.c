@@ -86,7 +86,7 @@ typedef struct _esws {
 } extSidewallStruct;
 
 /* --------------------- Debugging stuff ---------------------- */
-#define CAP_DEBUG	FALSE
+// NOTE: to turn on cap debugging, pass compiler flag -DCAP_DEBUG=1
 
 void extNregAdjustCap(nr, c, str)
     NodeRegion *nr;
@@ -231,20 +231,20 @@ extRelocateSubstrateCoupling(table, subsnode)
 	if (rtp == subsnode)
 	{
 	    rbp->nreg_cap += cap;
-        if (CAP_DEBUG) {
+#if CAP_DEBUG
             extNregAdjustCap(rbp, cap, "relocate_substrate_coupling");
             extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
-        }
+#endif
 	    extSetCapValue(he, (CapValue)0);
 	}
 	else if (rbp == subsnode)
 	{
 	    rtp->nreg_cap += cap;
-        if (CAP_DEBUG) {
+#if CAP_DEBUG
             extNregAdjustCap(rtp, cap, "relocate_substrate_coupling");
             extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
-        }
-	    extSetCapValue(he, (CapValue)0);
+#endif
+        extSetCapValue(he, (CapValue)0);
 	}
     }
 }
@@ -516,15 +516,17 @@ extAddOverlap(tbelow, ecpls)
 	     * above the Tbelow plane).
 	     */
 	    rabove->nreg_cap -= ExtCurStyle->exts_areaCap[ta] * ov.o_area;
-	    if (CAP_DEBUG)
+#if CAP_DEBUG
 		extNregAdjustCap(rabove,
 		    -(ExtCurStyle->exts_areaCap[ta] * ov.o_area),
 		    "obsolete_overlap");
-
-	} else if (CAP_DEBUG)
-	    extNregAdjustCap(rabove, 0.0,
-		"obsolete_overlap (skipped, wrong direction)");
-
+#endif
+    } else {
+#if CAP_DEBUG
+        extNregAdjustCap(rabove, 0.0,
+                         "obsolete_overlap (skipped, wrong direction)");
+#endif
+    }
         /* If the regions are the same, skip this part */
         if (rabove == rbelow) return (0);
 
@@ -536,9 +538,10 @@ extAddOverlap(tbelow, ecpls)
 	/* Add the overlap capacitance to the table */
 	c = extGetCapValue(he);
 	c += ExtCurStyle->exts_overlapCap[ta][tb] * ov.o_area;
-	if (CAP_DEBUG)
-	    extAdjustCouple(he, ExtCurStyle->exts_overlapCap[ta][tb] *
+#if CAP_DEBUG
+    extAdjustCouple(he, ExtCurStyle->exts_overlapCap[ta][tb] *
 		ov.o_area, "overlap");
+#endif
 	extSetCapValue(he, c);
     }
     return (0);
@@ -978,8 +981,9 @@ extRemoveSubcap(bp, clip, esws)
 
     subcap = ExtCurStyle->exts_perimCap[ta][tb] * (1.0 - snear) * length;
     rbp->nreg_cap -= subcap;
-    if (CAP_DEBUG)
-        extNregAdjustCap(rbp, -subcap, "obsolete_fringe (blocked)");
+#if CAP_DEBUG
+    extNregAdjustCap(rbp, -subcap, "obsolete_fringe (blocked)");
+#endif
 }
 
 /*
@@ -1240,15 +1244,19 @@ extSideOverlapHalo(tp, esws)
         if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
             CapValue substr = -rbp->nreg_cap;
             rbp->nreg_cap = 0;
-            if (CAP_DEBUG)
-                extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+#if CAP_DEBUG
+            extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+#endif
         }
-        if (CAP_DEBUG)
-	    	extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
+#if CAP_DEBUG
+        extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
+#endif
     	}
-	else if (CAP_DEBUG)
-	    extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
-
+    else {
+#if CAP_DEBUG
+        extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
+#endif
+    }
 	/* If the nodes are electrically connected, then we don't add	*/
 	/* any side overlap capacitance to the node.			*/
 	if (rtp == rbp) return 0;
@@ -1266,7 +1274,9 @@ extSideOverlapHalo(tp, esws)
 	    ck.ck_2 = rtp;
 	}
 	he = HashFind(extCoupleHashPtr, (char *) &ck);
-	if (CAP_DEBUG) extAdjustCouple(he, cap, "sideoverlap");
+#if CAP_DEBUG
+	extAdjustCouple(he, cap, "sideoverlap");
+#endif
 	extSetCapValue(he, cap + extGetCapValue(he));
     }
     return (0);
@@ -1422,15 +1432,19 @@ extSideOverlap(tp, esws)
         if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
             CapValue substr = -rbp->nreg_cap;
             rbp->nreg_cap = 0;
-            if (CAP_DEBUG)
-                extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+#if CAP_DEBUG
+            extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+#endif
         }
-	    if (CAP_DEBUG)
-	    	extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
+#if CAP_DEBUG
+        extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
+#endif
     	}
-	else if (CAP_DEBUG)
-	    extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
-
+    else {
+#if CAP_DEBUG
+        extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
+#endif
+    }
 	/* If the nodes are electrically connected, then we don't add	*/
 	/* any side overlap capacitance to the node.			*/
 	if (rtp == rbp) return 0;
@@ -1448,7 +1462,9 @@ extSideOverlap(tp, esws)
 	    ck.ck_2 = rtp;
 	}
 	he = HashFind(extCoupleHashPtr, (char *) &ck);
-	if (CAP_DEBUG) extAdjustCouple(he, cap, "sideoverlap");
+#if CAP_DEBUG
+	extAdjustCouple(he, cap, "sideoverlap");
+#endif
 	extSetCapValue(he, cap + extGetCapValue(he));
     }
     return (0);
@@ -2153,10 +2169,11 @@ extSideCommon(rinside, rfar, tpnear, tpfar, overlap, sep, extCoupleList)
     for (e = extCoupleList; e; e = e->ec_next)
 	if (TTMaskHasType(&e->ec_near, near) && TTMaskHasType(&e->ec_far, far)) {
 	    cap += (e->ec_cap * overlap) / (sep + e->ec_offset);
-	    if (CAP_DEBUG)
+#if CAP_DEBUG
 		extAdjustCouple(he,
 			(e->ec_cap * overlap) / (sep + e->ec_offset),
 			"sidewall");
+#endif
 	}
     extSetCapValue(he, cap);
 }
