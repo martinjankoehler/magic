@@ -231,21 +231,19 @@ extRelocateSubstrateCoupling(table, subsnode)
 	if (rtp == subsnode)
 	{
 	    rbp->nreg_cap += cap;
-        if (CAP_DEBUG)
-        extNregAdjustCap(rbp,
-            cap,
-            "relocate_substrate_coupling");
-
+        if (CAP_DEBUG) {
+            extNregAdjustCap(rbp, cap, "relocate_substrate_coupling");
+            extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
+        }
 	    extSetCapValue(he, (CapValue)0);
 	}
 	else if (rbp == subsnode)
 	{
 	    rtp->nreg_cap += cap;
-        if (CAP_DEBUG)
-        extNregAdjustCap(rtp,
-            cap,
-            "relocate_substrate_coupling");
-
+        if (CAP_DEBUG) {
+            extNregAdjustCap(rtp, cap, "relocate_substrate_coupling");
+            extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
+        }
 	    extSetCapValue(he, (CapValue)0);
 	}
     }
