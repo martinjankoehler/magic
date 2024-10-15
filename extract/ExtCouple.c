@@ -231,11 +231,21 @@ extRelocateSubstrateCoupling(table, subsnode)
 	if (rtp == subsnode)
 	{
 	    rbp->nreg_cap += cap;
+        if (CAP_DEBUG)
+        extNregAdjustCap(rbp,
+            cap,
+            "relocate_substrate_coupling");
+
 	    extSetCapValue(he, (CapValue)0);
 	}
 	else if (rbp == subsnode)
 	{
 	    rtp->nreg_cap += cap;
+        if (CAP_DEBUG)
+        extNregAdjustCap(rtp,
+            cap,
+            "relocate_substrate_coupling");
+
 	    extSetCapValue(he, (CapValue)0);
 	}
     }
@@ -970,6 +980,8 @@ extRemoveSubcap(bp, clip, esws)
 
     subcap = ExtCurStyle->exts_perimCap[ta][tb] * (1.0 - snear) * length;
     rbp->nreg_cap -= subcap;
+    if (CAP_DEBUG)
+        extNregAdjustCap(rbp, -subcap, "obsolete_fringe (blocked)");
 }
 
 /*
@@ -1227,9 +1239,13 @@ extSideOverlapHalo(tp, esws)
 	    rbp->nreg_cap -= subcap;
 	    /* Ignore residual error at ~zero zeptoFarads.  Probably	*/
 	    /* there should be better handling of round-off here.	*/
-	    if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001))
-		rbp->nreg_cap = 0;
-	    if (CAP_DEBUG)
+        if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
+            CapValue substr = -rbp->nreg_cap;
+            rbp->nreg_cap = 0;
+            if (CAP_DEBUG)
+                extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+        }
+        if (CAP_DEBUG)
 	    	extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
     	}
 	else if (CAP_DEBUG)
@@ -1405,8 +1421,12 @@ extSideOverlap(tp, esws)
 	    rbp->nreg_cap -= subcap;
 	    /* Ignore residual error at ~zero zeptoFarads.  Probably	*/
 	    /* there should be better handling of round-off here.	*/
-	    if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001))
-		rbp->nreg_cap = 0;
+        if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
+            CapValue substr = -rbp->nreg_cap;
+            rbp->nreg_cap = 0;
+            if (CAP_DEBUG)
+                extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+        }
 	    if (CAP_DEBUG)
 	    	extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
     	}
