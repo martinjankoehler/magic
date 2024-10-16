@@ -616,6 +616,22 @@ extSetResist(reg)
 	reg->nreg_pa[n].pa_perim = perim = extResistPerim[n];
 	if (area > 0 && perim > 0)
 	{
+#if CAP_DEBUG
+        {
+            const char *name = extNodeName(reg);
+//            const float FRINGE_MULT = 0.02; // see ExtTech.c:L70
+//            float dscale = CIFGetOutputScale(1000); // see ExtTech.c:L70
+//            const float DB_TO_um = FRINGE_MULT * dscale;
+            const float DB_TO_um = 200.0;
+            float perim_um = perim / DB_TO_um;
+            float area_um2 = (float)area / (DB_TO_um * DB_TO_um);
+            fprintf(stderr,
+                    "CapDebug extSetResult: %s "
+                    "area=%d (%.12g µm^2) perim=%d (%.12g µm)\n",
+                    name, area, area_um2, perim, perim_um);
+        }
+#endif
+        
 	    v = (double) ((dlong)perim * perim - 16 * area);
 
 	    /* Approximate by one square if v < 0 */

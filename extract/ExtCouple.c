@@ -93,9 +93,14 @@ void extNregAdjustCap(nr, c, str)
     CapValue c;
     char *str;
 {
+    if (fabs(c) <= 0.1) return; // ignore <0.1aF
+    
     char *name;
     name = extNodeName((LabRegion *) nr);
-    fprintf(stderr, "CapDebug: %s += %f (%s)\n", name, c, str);
+    char sign = c >= 0.0 ? '+' : '-';
+    fprintf(stderr, "CapDebug (%s): %s %c= %f fF …",
+            str, name, sign, fabs(c) / 1000.0);
+    fprintf(stderr, "\tnow %s == %f fF\n", name, nr->nreg_cap / 1000.0);
 }
 
 void extAdjustCouple(he, c, str)
@@ -103,13 +108,18 @@ void extAdjustCouple(he, c, str)
     CapValue c;
     char *str;
 {
+    if (fabs(c) <= 0.001) return; // ignore <0.001aF
+    
     char *name1;
     char *name2;
     CoupleKey *ck;
     ck = (CoupleKey *) he->h_key.h_words;
     name1 = extNodeName((LabRegion *) ck->ck_1);
     name2 = extNodeName((LabRegion *) ck->ck_2);
-    fprintf(stderr, "CapDebug: %s-%s += %f (%s)\n", name1, name2, c, str);
+    char sign = c >= 0.0 ? '+' : '-';
+    fprintf(stderr, "CapDebug (%s): %s-%s %c= %f fF …",
+            str, name1, name2, sign, fabs(c) / 1000.0);
+    fprintf(stderr, "\tnow %s-%s == %f fF\n", name1, name2, extGetCapValue(he) / 1000.0);
 }
 
 
@@ -232,19 +242,25 @@ extRelocateSubstrateCoupling(table, subsnode)
 	{
 	    rbp->nreg_cap += cap;
 #if CAP_DEBUG
-            extNregAdjustCap(rbp, cap, "relocate_substrate_coupling");
-            extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
+        extNregAdjustCap(rbp, cap, "relocate_substrate_coupling");
 #endif
-	    extSetCapValue(he, (CapValue)0);
+        CapValue subtr = -extGetCapValue(he);
+        extSetCapValue(he, (CapValue)0);
+#if CAP_DEBUG
+        extAdjustCouple(he, subtr, "relocate_substrate_coupling");
+#endif
 	}
 	else if (rbp == subsnode)
 	{
 	    rtp->nreg_cap += cap;
 #if CAP_DEBUG
-            extNregAdjustCap(rtp, cap, "relocate_substrate_coupling");
-            extAdjustCouple(he, -extGetCapValue(he), "relocate_substrate_coupling");
+        extNregAdjustCap(rtp, cap, "relocate_substrate_coupling");
 #endif
+        CapValue subtr = -extGetCapValue(he);
         extSetCapValue(he, (CapValue)0);
+#if CAP_DEBUG
+        extAdjustCouple(he, subtr, "relocate_substrate_coupling");
+#endif
 	}
     }
 }
@@ -538,11 +554,11 @@ extAddOverlap(tbelow, ecpls)
 	/* Add the overlap capacitance to the table */
 	c = extGetCapValue(he);
 	c += ExtCurStyle->exts_overlapCap[ta][tb] * ov.o_area;
+    extSetCapValue(he, c);
 #if CAP_DEBUG
     extAdjustCouple(he, ExtCurStyle->exts_overlapCap[ta][tb] *
 		ov.o_area, "overlap");
 #endif
-	extSetCapValue(he, c);
     }
     return (0);
 }
@@ -983,6 +999,16 @@ extRemoveSubcap(bp, clip, esws)
     rbp->nreg_cap -= subcap;
 #if CAP_DEBUG
     extNregAdjustCap(rbp, -subcap, "obsolete_fringe (blocked)");
+    const float DB_TO_um = 200.0;
+    fprintf(stderr,
+            "\toverlapMult=%g (%g aF/µm^2) dnear=%d (%g µm), snear=%g (%g µm), "
+            "perimCap[%d][%d]=%g (%g /µm), length=%d (%g µm)\n",
+            mult, mult * 1000.0,
+            dnear, dnear / DB_TO_um, snear, snear / DB_TO_um,
+            ta, tb,
+            ExtCurStyle->exts_perimCap[ta][tb],
+            (ExtCurStyle->exts_perimCap[ta][tb] * DB_TO_um),
+            length, length / DB_TO_um);
 #endif
 }
 
@@ -1274,10 +1300,10 @@ extSideOverlapHalo(tp, esws)
 	    ck.ck_2 = rtp;
 	}
 	he = HashFind(extCoupleHashPtr, (char *) &ck);
+    extSetCapValue(he, cap + extGetCapValue(he));
 #if CAP_DEBUG
 	extAdjustCouple(he, cap, "sideoverlap");
 #endif
-	extSetCapValue(he, cap + extGetCapValue(he));
     }
     return (0);
 }
@@ -1462,10 +1488,10 @@ extSideOverlap(tp, esws)
 	    ck.ck_2 = rtp;
 	}
 	he = HashFind(extCoupleHashPtr, (char *) &ck);
+    extSetCapValue(he, cap + extGetCapValue(he));
 #if CAP_DEBUG
 	extAdjustCouple(he, cap, "sideoverlap");
 #endif
-	extSetCapValue(he, cap + extGetCapValue(he));
     }
     return (0);
 }
@@ -2169,12 +2195,12 @@ extSideCommon(rinside, rfar, tpnear, tpfar, overlap, sep, extCoupleList)
     for (e = extCoupleList; e; e = e->ec_next)
 	if (TTMaskHasType(&e->ec_near, near) && TTMaskHasType(&e->ec_far, far)) {
 	    cap += (e->ec_cap * overlap) / (sep + e->ec_offset);
+        extSetCapValue(he, cap);
 #if CAP_DEBUG
 		extAdjustCouple(he,
 			(e->ec_cap * overlap) / (sep + e->ec_offset),
 			"sidewall");
 #endif
 	}
-    extSetCapValue(he, cap);
 }
 
