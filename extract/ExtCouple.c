@@ -1302,7 +1302,7 @@ extSideOverlapHalo(tp, esws)
 	he = HashFind(extCoupleHashPtr, (char *) &ck);
     extSetCapValue(he, cap + extGetCapValue(he));
 #if CAP_DEBUG
-	extAdjustCouple(he, cap, "sideoverlap");
+	extAdjustCouple(he, cap, "sideoverlaphalo");
 #endif
     }
     return (0);
