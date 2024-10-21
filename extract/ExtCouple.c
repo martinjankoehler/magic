@@ -1162,6 +1162,7 @@ extSideOverlapHalo(tp, esws)
 	    break;
     }
     if (dnear < 0) dnear = 0;	/* Don't count underlap */
+
     mult = ExtCurStyle->exts_overlapMult[ta][tb];
     sfar = 0.6366 * atan(mult * dfar);
     snear = 0.6366 * atan(mult * dnear);
@@ -1172,6 +1173,21 @@ extSideOverlapHalo(tp, esws)
 	
     cfrac = sfar - snear;
 
+#if CAP_DEBUG
+    const float DB_TO_um = 200.0;
+
+    fprintf(stderr,
+            "CapDebug (extSideOverlapHalo): (%s-%s) "
+            "length=%f µm, mult=%f "
+            "dnear=%f µm, dfar=%f µm, snear=%f, sfar=%f (cfrac=%f)\n",
+            DBTypeShortName(ta), DBTypeShortName(tb),
+            length / DB_TO_um,
+            mult,
+            dnear / DB_TO_um, dfar / DB_TO_um,
+            snear, sfar, cfrac);
+#endif
+
+    
     /* The fringe portion extracted from the substrate will be	*/
     /* different than the portion added to the coupling layer.	*/
 
@@ -1182,6 +1198,13 @@ extSideOverlapHalo(tp, esws)
 	snear = 0.6366 * atan(mult * dnear);
     }
     sfrac = sfar - snear;
+
+#if CAP_DEBUG
+    fprintf(stderr,
+            "CapDebug (extSideOverlapHalo) (%s-substrate): "
+            "snear=%f, sfar=%f (sfrac=%f)\n",
+            DBTypeShortName(ta), snear, sfar, sfrac);
+#endif
 
     /* Apply each rule, incorporating shielding into the edge length. */
     cap = subcap = (CapValue) 0;
@@ -1237,6 +1260,15 @@ extSideOverlapHalo(tp, esws)
 		cap += e->ec_cap * efflength;
 
 		subfrac += sov.so_subfrac;	/* Just add the shielded fraction */
+            
+#if CAP_DEBUG
+        fprintf(stderr,
+                "CapDebug (extSideOverlapHalo): efflength=%g "
+                " cap+=%g, so_coupfrac=%g so_subfrac+=%g\n",
+                efflength / 200.0, e->ec_cap * efflength / 200.0,
+                sov.so_coupfrac, sov.so_subfrac);
+#endif
+
 	    }
 	}
     }
