@@ -31,9 +31,15 @@
 /* to find the user's .Xauthority file to authenticate the X11		*/
 /* connection.								*/
 /*----------------------------------------------------------------------*/
+#ifdef __APPLE__
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syslimits.h>
+#endif
 
 #include <stdio.h>
-
 #include <tk.h>
 #include <tcl.h>
 
@@ -63,6 +69,51 @@ magic_AppInit(interp)
     return TCL_OK;
 }
 
+#ifdef __APPLE__
+void export_DISPLAY_environmental_variable() {
+    // let DISPLAY point to XQuartz file
+    // e.g. /private/tmp/com.apple.launchd.0T2i3MzWKw/org.xquartz:0
+    const char *DISPLAY = getenv("DISPLAY");
+    if (DISPLAY == NULL) {
+        const char *root_path = "/private/tmp/";
+        const char *prefix = "com.apple.launchd.";
+        const size_t prefix_len = strlen(prefix);
+        DIR *dir = opendir(root_path);
+        struct dirent *dp;
+        const char *dir_name = NULL;
+        const char *file_name = NULL;
+        char path[PATH_MAX];
+        int loop_finished = 0;
+        while ((dp = readdir(dir)) != NULL) {
+            dir_name = dp->d_name;
+            if (strncmp(prefix, dir_name, prefix_len) == 0) {
+                sprintf(path, "%s%s", root_path, dir_name);
+                DIR *subdir = opendir(path);
+                while ((dp = readdir(subdir)) != NULL) {
+                    file_name = dp->d_name;
+                    if (strcmp(file_name, "org.xquartz:0") == 0) {
+                        loop_finished = 1;
+                        break;
+                    }
+                }
+                closedir(subdir);
+                if (loop_finished) {
+                    break;
+                }
+            }
+        }
+        loop_finished: {
+            sprintf(path, "%s%s/%s", root_path, dir_name, file_name);
+            closedir(dir);
+            
+            setenv("DISPLAY", path, 1);
+            fprintf(stderr, "macOS: DISPLAY not set, exporting DISPLAY to %s\n", path);
+        }
+    }
+}
+#endif
+
+
 /*----------------------------------------------------------------------*/
 /* The main procedure;  replacement for "wish".				*/
 /*----------------------------------------------------------------------*/
@@ -72,6 +123,10 @@ main(argc, argv)
    int argc;
    char **argv;
 {
+#ifdef __APPLE__
+    export_DISPLAY_environmental_variable();
+#endif
+    
     Tk_Main(argc, argv, magic_AppInit);
     return 0;
 }
