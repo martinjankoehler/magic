@@ -699,6 +699,22 @@ extSubtractSideOverlap(tile, sov)
 
     sov->so_subfrac += (sfar - snear) * ((double)length / (double)sov->so_length);
 
+#if CAP_DEBUG
+    const float DB_TO_um = 200.0;
+    fprintf(stderr,
+            "\t(extSubtractSideOverlap) "
+            "layers %s(%d) - %s(%d), "
+            "snear=%g (%g µm), sfar=%g (%g µm), "
+            "length=%d (%g /µm), sov->so_length=%d (%g µm), "
+            "substrate fraction += %g\n",
+            DBTypeShortName(ta), ta, DBTypeShortName(tb), tb,
+            snear, sfar / DB_TO_um, sfar, sfar / DB_TO_um,
+            length, length / DB_TO_um,
+            sov->so_length, sov->so_length / DB_TO_um,
+            (sfar - snear) * ((double)length / (double)sov->so_length));
+    fflush(stderr);
+#endif
+    
     /* Do the same calculation but the the overlap multiplier for the	*/
     /* coupling layer, since the fringe capacitance has a different	*/
     /* halo than for the substrate.					*/
@@ -710,7 +726,22 @@ extSubtractSideOverlap(tile, sov)
 	sfar = 0.6366 * atan(mult * dfar);
     }
     sov->so_coupfrac += (sfar - snear) * ((double)length / (double)sov->so_length);
-
+    
+#if CAP_DEBUG
+    fprintf(stderr,
+            "\t(extSubtractSideOverlap) "
+            "layers %s(%d) - %s(%d), "
+            "snear=%g (%g µm), sfar=%g (%g µm), "
+            "length=%d (%g /µm), sov->so_length=%d (%g µm), "
+            "coupling fraction += %g\n",
+            DBTypeShortName(ta), ta, DBTypeShortName(tb), tb,
+            snear, sfar / DB_TO_um, sfar, sfar / DB_TO_um,
+            length, length / DB_TO_um,
+            sov->so_length, sov->so_length / DB_TO_um,
+            (sfar - snear) * ((double)length / (double)sov->so_length));
+    fflush(stderr);
+#endif
+    
     return (0);
 }
 
