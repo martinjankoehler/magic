@@ -1191,6 +1191,17 @@ ExtTechSimpleAreaCap(argc, argv)
 	    ExtCurStyle->exts_areaCap[t] = capVal;
 	    ExtCurStyle->exts_overlapMult[t][0] = (float) capVal * FRINGE_MULT;
 	    ExtCurStyle->exts_overlapMult[0][t] = (float) capVal * FRINGE_MULT;
+        
+#if CAP_DEBUG
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleAreaCap) (%s-substrate): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[%d][0]=%f\n",
+            DBTypeShortName(t), capVal, FRINGE_MULT, t, capVal * FRINGE_MULT);
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleAreaCap) (substrate-%s): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[0][%d]=%f\n",
+            DBTypeShortName(t), capVal, FRINGE_MULT, t, capVal * FRINGE_MULT);
+#endif
 	}
 
     if ((plane2 == -1) && (ExtCurStyle->exts_globSubstratePlane == -1)) return;
@@ -1279,6 +1290,20 @@ ExtTechSimpleAreaCap(argc, argv)
 		ExtCurStyle->exts_overlapCap[s][t] = capVal;
 		ExtCurStyle->exts_overlapMult[s][t] = (float)capVal * FRINGE_MULT;
 		ExtCurStyle->exts_overlapMult[t][s] = (float)capVal * FRINGE_MULT;
+            
+#if CAP_DEBUG
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleAreaCap) (%s-%s): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[%d][%d]=%f\n",
+            DBTypeShortName(s), DBTypeShortName(t),
+            capVal, FRINGE_MULT, s, t, capVal * FRINGE_MULT);
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleAreaCap) (%s-%s): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[%d][%d]=%f\n",
+            DBTypeShortName(t), DBTypeShortName(s),
+            capVal, FRINGE_MULT, t, s, capVal * FRINGE_MULT);
+#endif
+        
 		ExtCurStyle->exts_overlapPlanes |= PlaneNumToMaskBit(plane1);
 		if (plane2 != -1)
 		    ExtCurStyle->exts_overlapOtherPlanes[s] |= PlaneNumToMaskBit(plane2);
@@ -1660,6 +1685,20 @@ ExtTechSimpleOverlapCap(argv)
 		ExtCurStyle->exts_overlapCap[s][t] = capVal;
 		ExtCurStyle->exts_overlapMult[s][t] = (float)capVal * FRINGE_MULT;
 		ExtCurStyle->exts_overlapMult[t][s] = (float)capVal * FRINGE_MULT;
+            
+#if CAP_DEBUG
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleOverlapCap) (%s-%s): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[%d][%d]=%f\n",
+            DBTypeShortName(s), DBTypeShortName(t),
+            capVal, FRINGE_MULT, s, t, capVal * FRINGE_MULT);
+    fprintf(stderr,
+            "CapDebug (ExtTechSimpleOverlapCap) (%s-%s): "
+            "capVal=%f, FRINGE_MULT=%f, exts_overlapMult[%d][%d]=%f\n",
+            DBTypeShortName(t), DBTypeShortName(s),
+            capVal, FRINGE_MULT, t, s, capVal * FRINGE_MULT);
+#endif
+            
 		ExtCurStyle->exts_overlapPlanes |= PlaneNumToMaskBit(plane1);
 		ExtCurStyle->exts_overlapOtherPlanes[s] |= PlaneNumToMaskBit(plane2);
 		TTMaskSetType(&ExtCurStyle->exts_overlapTypes[plane1], s);
@@ -3727,6 +3766,17 @@ zinit:
 		style->exts_perimCap[r][s] *= scalefac;
 		style->exts_overlapCap[r][s] *= sqfac;
 		style->exts_overlapMult[r][s] *= scalefac;
+            
+#if CAP_DEBUG
+        if (style->exts_overlapMult[r][s] > 0.0) {
+            fprintf(stderr,
+                    "CapDebug (extTechFinalStyle) (%s-%s): "
+                    "scale=%f, exts_overlapMult[%d][%d]=%f\n",
+                    DBTypeShortName(r), DBTypeShortName(s),
+                    scalefac, r, s, style->exts_overlapMult[r][s]);
+        }
+#endif
+
 		for (ec = style->exts_sideOverlapCap[r][s]; ec != NULL;
 				ec = ec->ec_next)
 		    ec->ec_cap *= scalefac;
@@ -3897,6 +3947,16 @@ ExtTechScale(scalen, scaled)
 	    style->exts_overlapMult[i][j] *= scalen;
 	    style->exts_overlapMult[i][j] /= scaled;
 
+#if CAP_DEBUG
+        if (style->exts_overlapMult[i][j] > 0.0) {
+            fprintf(stderr,
+                    "CapDebug (ExtTechScale) (%s-%s): "
+                    "scalen=%d, scaled=%d, exts_overlapMult[%d][%d]=%f\n",
+                    DBTypeShortName(i), DBTypeShortName(j),
+                    scalen, scaled, i, j, style->exts_overlapMult[i][j]);
+        }
+#endif
+
 	    // Do not scale sidewall cap, for while the value is
 	    // per distance, the distance is referred to a separation
 	    // distance in the same units, so the cap never scales.
@@ -3916,6 +3976,11 @@ ExtTechScale(scalen, scaled)
 	    }
 	}
     }
+
+#if CAP_DEBUG
+    fprintf(stderr, "----------------------------------------------------\n");
+    fflush(stderr);
+#endif
 
     return;
 }
