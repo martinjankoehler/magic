@@ -101,6 +101,7 @@ void extNregAdjustCap(nr, c, str)
     fprintf(stderr, "CapDebug (%s): %s %c= %f fF …",
             str, name, sign, fabs(c) / 1000.0);
     fprintf(stderr, "\tnow %s == %f fF\n", name, nr->nreg_cap / 1000.0);
+    fflush(stderr);
 }
 
 void extAdjustCouple(he, c, str)
@@ -120,6 +121,7 @@ void extAdjustCouple(he, c, str)
     fprintf(stderr, "CapDebug (%s): %s-%s %c= %f fF …",
             str, name1, name2, sign, fabs(c) / 1000.0);
     fprintf(stderr, "\tnow %s-%s == %f fF\n", name1, name2, extGetCapValue(he) / 1000.0);
+    fflush(stderr);
 }
 
 
@@ -1009,6 +1011,7 @@ extRemoveSubcap(bp, clip, esws)
             ExtCurStyle->exts_perimCap[ta][tb],
             (ExtCurStyle->exts_perimCap[ta][tb] * DB_TO_um),
             length, length / DB_TO_um);
+    fflush(stderr);
 #endif
 }
 
@@ -1185,6 +1188,7 @@ extSideOverlapHalo(tp, esws)
             mult,
             dnear / DB_TO_um, dfar / DB_TO_um,
             snear, sfar, cfrac);
+    fflush(stderr);
 #endif
 
     
@@ -1204,6 +1208,7 @@ extSideOverlapHalo(tp, esws)
             "CapDebug (extSideOverlapHalo) (%s-substrate): "
             "snear=%f, sfar=%f (sfrac=%f)\n",
             DBTypeShortName(ta), snear, sfar, sfrac);
+    fflush(stderr);
 #endif
 
     /* Apply each rule, incorporating shielding into the edge length. */
@@ -1267,6 +1272,7 @@ extSideOverlapHalo(tp, esws)
                 " cap+=%g, so_coupfrac=%g so_subfrac+=%g\n",
                 efflength / 200.0, e->ec_cap * efflength / 200.0,
                 sov.so_coupfrac, sov.so_subfrac);
+        fflush(stderr);
 #endif
 
 	    }
