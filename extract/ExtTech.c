@@ -1403,6 +1403,14 @@ ExtTechSimplePerimCap(argc, argv)
 	    {
 		ExtCurStyle->exts_perimCap[s][t] = capVal;
 		TTMaskSetType(&ExtCurStyle->exts_perimCapMask[s], t);
+            
+#if CAP_DEBUG
+    fprintf(stderr,
+            "CapDebug (ExtTechSimplePerimCap) (%s-%s): "
+            "exts_perimCap[%d][%d]=%f\n",
+            DBTypeShortName(s), DBTypeShortName(t),
+            s, t, capVal);
+#endif
 	    }
 
     if ((plane2 == -1) && (ExtCurStyle->exts_globSubstratePlane == -1)) return;
@@ -1839,6 +1847,17 @@ ExtTechSimpleSideOverlapCap(argv)
 		cnew->ec_pmask = PlaneNumToMaskBit(plane2);
 		cnew->ec_next = ExtCurStyle->exts_sideOverlapCap[s][t];
 		ExtCurStyle->exts_sideOverlapCap[s][t] = cnew;
+
+#if CAP_DEBUG
+        if (capVal >= 0.0) {
+            fprintf(stderr,
+                    "CapDebug (ExtTechSimpleSideOverlapCap) (%s-%s) (plane %s): "
+                    "exts_sideOverlapCap[%d][%d]=%f\n",
+                    DBTypeShortName(s), DBTypeShortName(t), DBTypeShortName(plane2),
+                    s, t, capVal);
+            
+        }
+#endif
 
 		for (r = TT_TECHDEPBASE; r < DBNumTypes; r++)
 		    if (TTMaskHasType(&ov, r))
@@ -3764,6 +3783,16 @@ zinit:
 		EdgeCap *ec;
 
 		style->exts_perimCap[r][s] *= scalefac;
+#if CAP_DEBUG
+        if (style->exts_perimCap[r][s] > 0.0) {
+            fprintf(stderr,
+                    "CapDebug (extTechFinalStyle) (%s-%s): "
+                    "scale=%f, exts_perimCap[%d][%d]=%f\n",
+                    DBTypeShortName(r), DBTypeShortName(s),
+                    scalefac, r, s, style->exts_perimCap[r][s]);
+        }
+#endif
+            
 		style->exts_overlapCap[r][s] *= sqfac;
 		style->exts_overlapMult[r][s] *= scalefac;
             
@@ -3948,6 +3977,14 @@ ExtTechScale(scalen, scaled)
 	    style->exts_overlapMult[i][j] /= scaled;
 
 #if CAP_DEBUG
+        if (style->exts_perimCap[i][j] > 0.0) {
+            fprintf(stderr,
+                    "CapDebug (ExtTechScale) (%s-%s): "
+                    "scalen=%d, scaled=%d, exts_perimCap[%d][%d]=%f\n",
+                    DBTypeShortName(i), DBTypeShortName(j),
+                    scalen, scaled, i, j, style->exts_perimCap[i][j]);
+        }
+
         if (style->exts_overlapMult[i][j] > 0.0) {
             fprintf(stderr,
                     "CapDebug (ExtTechScale) (%s-%s): "

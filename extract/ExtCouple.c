@@ -1212,12 +1212,12 @@ extSideOverlapHalo(tp, esws)
 
     fprintf(stderr,
             "CapDebug (extSideOverlapHalo): (%s-%s) "
-            "length=%f µm, mult=%f "
-            "dnear=%f µm, dfar=%f µm, snear=%f, sfar=%f (cfrac=%f)\n",
+            "length=%f µm, mult=%f, "
+            "dnear=%f µm (%d), dfar=%f µm (%d), snear=%f, sfar=%f (cfrac=%f)\n",
             DBTypeShortName(ta), DBTypeShortName(tb),
             length / DB_TO_um,
             mult,
-            dnear / DB_TO_um, dfar / DB_TO_um,
+            dnear / DB_TO_um, dnear, dfar / DB_TO_um, dfar,
             snear, sfar, cfrac);
     fflush(stderr);
 #endif
@@ -1237,8 +1237,9 @@ extSideOverlapHalo(tp, esws)
 #if CAP_DEBUG
     fprintf(stderr,
             "CapDebug (extSideOverlapHalo) (%s-substrate): "
+            "mult=%f, "
             "snear=%f, sfar=%f (sfrac=%f)\n",
-            DBTypeShortName(ta), snear, sfar, sfrac);
+            DBTypeShortName(ta), mult, snear, sfar, sfrac);
     fflush(stderr);
 #endif
 
@@ -1299,10 +1300,12 @@ extSideOverlapHalo(tp, esws)
             
 #if CAP_DEBUG
         fprintf(stderr,
-                "CapDebug (extSideOverlapHalo): efflength=%g "
-                " cap+=%g, so_coupfrac=%g so_subfrac+=%g\n",
-                efflength / 200.0, e->ec_cap * efflength / 200.0,
-                sov.so_coupfrac, sov.so_subfrac);
+                "CapDebug (extSideOverlapHalo): efflength=%g µm, "
+                "cap+=%g aF, cap=%g aF, e->ec_cap=%g, so_coupfrac=%g, "
+                "subfrac+=%g, subfrac=%g, so_subfrac=%g\n",
+                efflength / 200.0,
+                e->ec_cap * efflength / 200.0, cap, e->ec_cap, sov.so_coupfrac,
+                subfrac - sov.so_subfrac, subfrac, sov.so_subfrac);
         fflush(stderr);
 #endif
 
