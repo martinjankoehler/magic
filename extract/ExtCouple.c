@@ -480,10 +480,10 @@ extAddOverlap(tbelow, ecpls)
     /* Revert any contacts to their residues */
 
     if (DBIsContact(ta))
-	ta = DBPlaneToResidue(ta, ecpls->plane_of_tile);
+        ta = DBPlaneToResidue(ta, ecpls->plane_of_tile);
 
     if (DBIsContact(tb))
-	tb = DBPlaneToResidue(tb, ecpls->plane_checked);
+        tb = DBPlaneToResidue(tb, ecpls->plane_checked);
 
     /*
      * Find whether rabove and rbelow are shielded by intervening material.

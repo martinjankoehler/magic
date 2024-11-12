@@ -4697,8 +4697,9 @@ extNodeAreaFunc(tile, arg)
             t = (SplitSide(tile)) ? SplitLeftType(tile):
                         SplitRightType(tile);
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
-	    if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0)
-		reg->nreg_cap += capval * len;
+        if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
+            reg->nreg_cap += capval * len;
+        }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
 		extResistPerim[resistClass] += len;
 	}
@@ -4749,8 +4750,9 @@ topside:
 		}
 	    }
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
-	    if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0)
-		reg->nreg_cap += capval * len;
+        if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
+            reg->nreg_cap += capval * len;
+        }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
 		extResistPerim[resistClass] += len;
 	}
@@ -4794,10 +4796,11 @@ leftside:
 		}
 	    }
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
-	    if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0)
-		reg->nreg_cap += capval * len;
+        if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
+            reg->nreg_cap += capval * len;
+        }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
-		extResistPerim[resistClass] += len;
+            extResistPerim[resistClass] += len;
 	}
 
 	/* Bottom */
@@ -4810,40 +4813,41 @@ bottomside:
 	{
 	    if (extNodeClipArea)
 	    {
-		r.r_ybot = r.r_ytop = BOTTOM(tile);
-		r.r_xtop = MIN(RIGHT(tile), RIGHT(tp));
-		r.r_xbot = MAX(LEFT(tile), LEFT(tp));
-		GEOCLIP(&r, extNodeClipArea);
-		len = EDGENULL(&r) ? 0 : r.r_xtop - r.r_xbot;
+            r.r_ybot = r.r_ytop = BOTTOM(tile);
+            r.r_xtop = MIN(RIGHT(tile), RIGHT(tp));
+            r.r_xbot = MAX(LEFT(tile), LEFT(tp));
+            GEOCLIP(&r, extNodeClipArea);
+            len = EDGENULL(&r) ? 0 : r.r_xtop - r.r_xbot;
 	    }
 	    else len = MIN(RIGHT(tile), RIGHT(tp)) - MAX(LEFT(tile), LEFT(tp));
-            if (IsSplit(tp))
+        if (IsSplit(tp))
 	    {
-                t = SplitTopType(tp);
-		if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
-		{
-		    PUSHTILETOP(tp, tilePlaneNum);
-		}
-		else if (tp->ti_client != (ClientData)reg && TTMaskHasType(mask, t))
-		{
-		    /* Count split tile twice, once for each node it belongs to. */
-		    tp->ti_client = extUnInit;
-		    PUSHTILETOP(tp, tilePlaneNum);
-		}
+            t = SplitTopType(tp);
+            if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
+            {
+                PUSHTILETOP(tp, tilePlaneNum);
+            }
+            else if (tp->ti_client != (ClientData)reg && TTMaskHasType(mask, t))
+            {
+                /* Count split tile twice, once for each node it belongs to. */
+                tp->ti_client = extUnInit;
+                PUSHTILETOP(tp, tilePlaneNum);
+            }
 	    }
-            else
+        else
 	    {
-		t = TiGetTypeExact(tp);
-		if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
-		{
-		    PUSHTILE(tp, tilePlaneNum);
-		}
+            t = TiGetTypeExact(tp);
+            if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
+            {
+                PUSHTILE(tp, tilePlaneNum);
+            }
 	    }
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
-	    if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0)
-		reg->nreg_cap += capval * len;
+        if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
+            reg->nreg_cap += capval * len;
+        }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
-		extResistPerim[resistClass] += len;
+            extResistPerim[resistClass] += len;
 	}
 
 	/* Right */
@@ -4855,40 +4859,41 @@ rightside:
 	{
 	    if (extNodeClipArea)
 	    {
-		r.r_xbot = r.r_xtop = RIGHT(tile);
-		r.r_ytop = MIN(TOP(tile), TOP(tp));
-		r.r_ybot = MAX(BOTTOM(tile), BOTTOM(tp));
-		GEOCLIP(&r, extNodeClipArea);
-		len = EDGENULL(&r) ? 0 : r.r_ytop - r.r_ybot;
+            r.r_xbot = r.r_xtop = RIGHT(tile);
+            r.r_ytop = MIN(TOP(tile), TOP(tp));
+            r.r_ybot = MAX(BOTTOM(tile), BOTTOM(tp));
+            GEOCLIP(&r, extNodeClipArea);
+            len = EDGENULL(&r) ? 0 : r.r_ytop - r.r_ybot;
 	    }
 	    else len = MIN(TOP(tile), TOP(tp)) - MAX(BOTTOM(tile), BOTTOM(tp));
-            if (IsSplit(tp))
+        if (IsSplit(tp))
 	    {
-                t = SplitLeftType(tp);
-		if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
-		{
-		    PUSHTILELEFT(tp, tilePlaneNum);
-		}
-		else if (tp->ti_client != (ClientData)reg && TTMaskHasType(mask, t))
-		{
-		    /* Count split tile twice, once for each node it belongs to	*/
-		    tp->ti_client = extUnInit;
-		    PUSHTILELEFT(tp, tilePlaneNum);
-		}
+            t = SplitLeftType(tp);
+            if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
+            {
+                PUSHTILELEFT(tp, tilePlaneNum);
+            }
+            else if (tp->ti_client != (ClientData)reg && TTMaskHasType(mask, t))
+            {
+                /* Count split tile twice, once for each node it belongs to	*/
+                tp->ti_client = extUnInit;
+                PUSHTILELEFT(tp, tilePlaneNum);
+            }
 	    }
-            else
+        else
 	    {
-		t = TiGetTypeExact(tp);
-		if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
-		{
-		    PUSHTILE(tp, tilePlaneNum);
-		}
+            t = TiGetTypeExact(tp);
+            if (tp->ti_client == extUnInit && TTMaskHasType(mask, t))
+            {
+                PUSHTILE(tp, tilePlaneNum);
+            }
 	    }
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
-	    if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0)
-		reg->nreg_cap += capval * len;
+        if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
+            reg->nreg_cap += capval * len;
+        }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
-		extResistPerim[resistClass] += len;
+            extResistPerim[resistClass] += len;
 	}
 
 donesides:
@@ -4902,95 +4907,95 @@ donesides:
 	    pMask = DBConnPlanes[type];
 	    pMask &= ~(PlaneNumToMaskBit(tilePlaneNum));
 	    for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
-		if (PlaneMaskHasPlane(pMask, pNum))
-		{
-		    Plane *plane = arg->fra_def->cd_planes[pNum];
+            if (PlaneMaskHasPlane(pMask, pNum))
+            {
+                Plane *plane = arg->fra_def->cd_planes[pNum];
 
-		    tp = plane->pl_hint;
-		    GOTOPOINT(tp, &tile->ti_ll);
-		    plane->pl_hint = tp;
+                tp = plane->pl_hint;
+                GOTOPOINT(tp, &tile->ti_ll);
+                plane->pl_hint = tp;
 
-		    if (tp->ti_client != extUnInit) continue;
+                if (tp->ti_client != extUnInit) continue;
 
-		    /* tp and tile should have the same geometry for a contact */
-		    if (IsSplit(tile) && IsSplit(tp))
-		    {
-			if (SplitSide(tile))
-			{
-			    t = SplitRightType(tp);
-			    if (TTMaskHasType(mask, t))
-			    {
-				PUSHTILERIGHT(tp, pNum);
-			    }
-			}
-			else
-			{
-			    t = SplitLeftType(tp);
-			    if (TTMaskHasType(mask, t))
-			    {
-				PUSHTILELEFT(tp, pNum);
-			    }
-			}
-		    }
-		    else if (IsSplit(tp))
-		    {
-			/* Need to test both sides of the tile */
-			t = SplitRightType(tp);
-			if (TTMaskHasType(mask, t))
-			{
-			    PUSHTILERIGHT(tp, pNum);
-			}
-			t = SplitLeftType(tp);
-			if (TTMaskHasType(mask, t))
-			{
-			    PUSHTILELEFT(tp, pNum);
-			}
-		    }
-		    else
-		    {
-			t = TiGetTypeExact(tp);
-			if (TTMaskHasType(mask, t))
-			{
-			    PUSHTILE(tp, pNum);
-			}
-		    }
-		}
-	}
+                /* tp and tile should have the same geometry for a contact */
+                if (IsSplit(tile) && IsSplit(tp))
+                {
+                    if (SplitSide(tile))
+                    {
+                        t = SplitRightType(tp);
+                        if (TTMaskHasType(mask, t))
+                        {
+                            PUSHTILERIGHT(tp, pNum);
+                        }
+                    }
+                    else
+                    {
+                        t = SplitLeftType(tp);
+                        if (TTMaskHasType(mask, t))
+                        {
+                            PUSHTILELEFT(tp, pNum);
+                        }
+                    }
+                }
+                else if (IsSplit(tp))
+                {
+                    /* Need to test both sides of the tile */
+                    t = SplitRightType(tp);
+                    if (TTMaskHasType(mask, t))
+                    {
+                        PUSHTILERIGHT(tp, pNum);
+                    }
+                    t = SplitLeftType(tp);
+                    if (TTMaskHasType(mask, t))
+                    {
+                        PUSHTILELEFT(tp, pNum);
+                    }
+                }
+                else
+                {
+                    t = TiGetTypeExact(tp);
+                    if (TTMaskHasType(mask, t))
+                    {
+                        PUSHTILE(tp, pNum);
+                    }
+                }
+            }
+        }
 
-	/*
-	 * The hairiest case is when this type connects to stuff on
-	 * other planes, but isn't itself connected as a contact.
-	 * For example, a CMOS pwell connects to diffusion of the
-	 * same doping (p substrate diff).  In a case like this,
-	 * we need to search the entire AREA of the tile plus a
-	 * 1-lambda halo to find everything it overlaps or touches
-	 * on the other plane.
-	 */
-	if ((pMask = DBAllConnPlanes[type]))
-	{
-	    Rect biggerArea;
-	    bool is_split = IsSplit(tile);
+        /*
+         * The hairiest case is when this type connects to stuff on
+         * other planes, but isn't itself connected as a contact.
+         * For example, a CMOS pwell connects to diffusion of the
+         * same doping (p substrate diff).  In a case like this,
+         * we need to search the entire AREA of the tile plus a
+         * 1-lambda halo to find everything it overlaps or touches
+         * on the other plane.
+         */
+        if ((pMask = DBAllConnPlanes[type]))
+        {
+            Rect biggerArea;
+            bool is_split = IsSplit(tile);
 
-	    extNbrUn = extUnInit;
-	    TITORECT(tile, &pla.area);
-	    GEO_EXPAND(&pla.area, 1, &biggerArea);
-	    for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
-		if ((pNum != tilePlaneNum) && PlaneMaskHasPlane(pMask, pNum))
-		{
-		    pla.plane = pNum;
-		    if (is_split)
-		        DBSrPaintNMArea((Tile *) NULL,
-				arg->fra_def->cd_planes[pNum],
-				TiGetTypeExact(tile) &
-				(TT_DIAGONAL | TT_SIDE | TT_DIRECTION),
-				&biggerArea, mask, extNbrPushFunc,
-				(ClientData) &pla);
-		    else
-		        DBSrPaintArea((Tile *) NULL,
-				arg->fra_def->cd_planes[pNum], &biggerArea,
-				mask, extNbrPushFunc, (ClientData) &pla);
-		}
-	}
+            extNbrUn = extUnInit;
+            TITORECT(tile, &pla.area);
+            GEO_EXPAND(&pla.area, 1, &biggerArea);
+            for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
+                if ((pNum != tilePlaneNum) && PlaneMaskHasPlane(pMask, pNum))
+                {
+                    pla.plane = pNum;
+                    if (is_split)
+                        DBSrPaintNMArea((Tile *) NULL,
+                                        arg->fra_def->cd_planes[pNum],
+                                        TiGetTypeExact(tile) &
+                                        (TT_DIAGONAL | TT_SIDE | TT_DIRECTION),
+                                        &biggerArea, mask, extNbrPushFunc,
+                                        (ClientData) &pla);
+                    else
+                        DBSrPaintArea((Tile *) NULL,
+                                      arg->fra_def->cd_planes[pNum], &biggerArea,
+                                      mask, extNbrPushFunc, (ClientData) &pla);
+                }
+        }
     }
 
     return (0);
