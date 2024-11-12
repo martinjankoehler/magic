@@ -470,7 +470,7 @@ extAddOverlap(tbelow, ecpls)
     ov.o_clip.r_ytop = MIN(TOP(tbelow), TOP(tabove));
     if (extCoupleSearchArea)
     {
-	GEOCLIP(&ov.o_clip, extCoupleSearchArea);
+        GEOCLIP(&ov.o_clip, extCoupleSearchArea);
     }
     ov.o_area = (ov.o_clip.r_ytop - ov.o_clip.r_ybot)
 	      * (ov.o_clip.r_xtop - ov.o_clip.r_xbot);
@@ -492,74 +492,74 @@ extAddOverlap(tbelow, ecpls)
      */
     if ((ov.o_pmask = ExtCurStyle->exts_overlapShieldPlanes[ta][tb]))
     {
-	ov.o_tmask = ExtCurStyle->exts_overlapShieldTypes[ta][tb];
-	for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
-	{
-	    if (!PlaneMaskHasPlane(ov.o_pmask, pNum)) continue;
-	    ov.o_pmask &= ~(PlaneNumToMaskBit(pNum));
-	    if (ov.o_pmask == 0)
-	    {
-		(void) DBSrPaintArea((Tile *) NULL,
-		    extOverlapDef->cd_planes[pNum], &ov.o_clip, &ov.o_tmask,
-		    extSubtractOverlap, (ClientData) &ov);
-	    }
-	    else
-	    {
-		(void) DBSrPaintArea((Tile *) NULL,
-		    extOverlapDef->cd_planes[pNum], &ov.o_clip, &DBAllTypeBits,
-		    extSubtractOverlap2, (ClientData) &ov);
-	    }
-	    break;
-	}
+        ov.o_tmask = ExtCurStyle->exts_overlapShieldTypes[ta][tb];
+        for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
+        {
+            if (!PlaneMaskHasPlane(ov.o_pmask, pNum)) continue;
+            ov.o_pmask &= ~(PlaneNumToMaskBit(pNum));
+            if (ov.o_pmask == 0)
+            {
+                (void) DBSrPaintArea((Tile *) NULL,
+                    extOverlapDef->cd_planes[pNum], &ov.o_clip, &ov.o_tmask,
+                    extSubtractOverlap, (ClientData) &ov);
+            }
+            else
+            {
+                (void) DBSrPaintArea((Tile *) NULL,
+                    extOverlapDef->cd_planes[pNum], &ov.o_clip, &DBAllTypeBits,
+                    extSubtractOverlap2, (ClientData) &ov);
+            }
+            break;
+        }
     }
 
     /* If any capacitance remains, add this record to the table */
     if (ov.o_area > 0)
     {
-	int oa = ExtCurStyle->exts_planeOrder[ecpls->plane_of_tile];
-	int ob = ExtCurStyle->exts_planeOrder[ecpls->plane_checked];
-	if (oa > ob)
-	{
-	    Tile *tp;
-	    TileType t, tres;
-	    TileTypeBitMask *mask;
-	    int len;
-	    CapValue cp;
-	    /*
-	     * Subtract the substrate capacitance from tabove's region due to
-	     * the area of the overlap, minus any shielded area.  The shielded
-	     * areas get handled later, when processing coupling between tabove
-	     * and the shielding tile.  (Tabove was the overlapping tile, so it
-	     * is shielded from the substrate by tbelow if the Tabove plane is
-	     * above the Tbelow plane).
-	     */
-	    rabove->nreg_cap -= ExtCurStyle->exts_areaCap[ta] * ov.o_area;
+        int oa = ExtCurStyle->exts_planeOrder[ecpls->plane_of_tile];
+        int ob = ExtCurStyle->exts_planeOrder[ecpls->plane_checked];
+        if (oa > ob)
+        {
+            Tile *tp;
+            TileType t, tres;
+            TileTypeBitMask *mask;
+            int len;
+            CapValue cp;
+            /*
+             * Subtract the substrate capacitance from tabove's region due to
+             * the area of the overlap, minus any shielded area.  The shielded
+             * areas get handled later, when processing coupling between tabove
+             * and the shielding tile.  (Tabove was the overlapping tile, so it
+             * is shielded from the substrate by tbelow if the Tabove plane is
+             * above the Tbelow plane).
+             */
+            rabove->nreg_cap -= ExtCurStyle->exts_areaCap[ta] * ov.o_area;
 #if CAP_DEBUG
-		extNregAdjustCap(rabove,
-		    -(ExtCurStyle->exts_areaCap[ta] * ov.o_area),
-		    "obsolete_overlap");
+            extNregAdjustCap(rabove,
+                -(ExtCurStyle->exts_areaCap[ta] * ov.o_area),
+                "obsolete_overlap");
 #endif
-    } else {
+        } else {
 #if CAP_DEBUG
-        extNregAdjustCap(rabove, 0.0,
-                         "obsolete_overlap (skipped, wrong direction)");
+            extNregAdjustCap(rabove, 0.0,
+                             "obsolete_overlap (skipped, wrong direction)");
 #endif
-    }
+        }
         /* If the regions are the same, skip this part */
         if (rabove == rbelow) return (0);
 
-	/* Find the coupling hash record */
-	if (rabove < rbelow) ck.ck_1 = rabove, ck.ck_2 = rbelow;
-	else ck.ck_1 = rbelow, ck.ck_2 = rabove;
-	he = HashFind(extCoupleHashPtr, (char *) &ck);
+        /* Find the coupling hash record */
+        if (rabove < rbelow) ck.ck_1 = rabove, ck.ck_2 = rbelow;
+        else ck.ck_1 = rbelow, ck.ck_2 = rabove;
+        he = HashFind(extCoupleHashPtr, (char *) &ck);
 
-	/* Add the overlap capacitance to the table */
-	c = extGetCapValue(he);
-	c += ExtCurStyle->exts_overlapCap[ta][tb] * ov.o_area;
-    extSetCapValue(he, c);
+        /* Add the overlap capacitance to the table */
+        c = extGetCapValue(he);
+        c += ExtCurStyle->exts_overlapCap[ta][tb] * ov.o_area;
+        extSetCapValue(he, c);
 #if CAP_DEBUG
-    extAdjustCouple(he, ExtCurStyle->exts_overlapCap[ta][tb] *
-		ov.o_area, "overlap");
+        extAdjustCouple(he, ExtCurStyle->exts_overlapCap[ta][tb] *
+            ov.o_area, "overlap");
 #endif
     }
     return (0);
@@ -1161,18 +1161,18 @@ extSideOverlapHalo(tp, esws)
     /* Calculate the length of the clipped area */
 
     if (bp->b_segment.r_xtop == bp->b_segment.r_xbot)
-	length = sov.so_clip.r_ytop - sov.so_clip.r_ybot;
+        length = sov.so_clip.r_ytop - sov.so_clip.r_ybot;
     else
-	length = sov.so_clip.r_xtop - sov.so_clip.r_xbot;
+        length = sov.so_clip.r_xtop - sov.so_clip.r_xbot;
 
     /* ta is the tile type of the edge generating the fringe cap. */
     ta = TiGetType(bp->b_inside);
 
     /* Revert any contacts to their residues */
     if (DBIsContact(ta))
-	ta = DBPlaneToResidue(ta, esws->plane_of_boundary);
+        ta = DBPlaneToResidue(ta, esws->plane_of_boundary);
     if (DBIsContact(tb))
-	tb = DBPlaneToResidue(tb, esws->plane_checked);
+        tb = DBPlaneToResidue(tb, esws->plane_checked);
 
     /* Find the fraction of the fringe cap seen by tile tp (depends	*/
     /* on the tile width and distance from the boundary)		*/
@@ -1228,9 +1228,9 @@ extSideOverlapHalo(tp, esws)
 
     if (ExtCurStyle->exts_overlapMult[ta][0] != mult)
     {
-	mult = ExtCurStyle->exts_overlapMult[ta][0];
-	sfar = 0.6366 * atan(mult * dfar);
-	snear = 0.6366 * atan(mult * dnear);
+        mult = ExtCurStyle->exts_overlapMult[ta][0];
+        sfar = 0.6366 * atan(mult * dfar);
+        snear = 0.6366 * atan(mult * dnear);
     }
     sfrac = sfar - snear;
 
@@ -1248,133 +1248,133 @@ extSideOverlapHalo(tp, esws)
     subfrac = 0.0;
     for (e = esws->extOverlapList; e; e = e->ec_next)
     {
-	/* Only apply rules for the plane in which they are declared */
-	if (!PlaneMaskHasPlane(e->ec_pmask, esws->plane_checked)) continue;
+        /* Only apply rules for the plane in which they are declared */
+        if (!PlaneMaskHasPlane(e->ec_pmask, esws->plane_checked)) continue;
 
-	/* Does this rule "e" include the tile we found? */
-	if (TTMaskHasType(&e->ec_near, TiGetType(tp)))
-	{
-	    /* We have a possible capacitor, but are the tiles shielded from
-	     * each other part of the way?
-	     */
-	    int pNum;
-	    sov.so_pmask = ExtCurStyle->exts_sideOverlapShieldPlanes[ta][tb];
-	    sov.so_esws = esws;
-	    sov.so_coupfrac = (double)0.0;
-	    sov.so_subfrac = (double)0.0;
-	    sov.so_length = length;
-	    sov.so_ctype = tb;
+        /* Does this rule "e" include the tile we found? */
+        if (TTMaskHasType(&e->ec_near, TiGetType(tp)))
+        {
+            /* We have a possible capacitor, but are the tiles shielded from
+             * each other part of the way?
+             */
+            int pNum;
+            sov.so_pmask = ExtCurStyle->exts_sideOverlapShieldPlanes[ta][tb];
+            sov.so_esws = esws;
+            sov.so_coupfrac = (double)0.0;
+            sov.so_subfrac = (double)0.0;
+            sov.so_length = length;
+            sov.so_ctype = tb;
 
-	    if (sov.so_pmask)
-	    {
-		sov.so_tmask = e->ec_far;  /* Actually shieldtypes. */
-		for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
-		{
-		    /* Each call to DBSrPaintArea has an opportunity to
-		     * subtract a partial capacitance from the total.
-		     */
-		    if (!PlaneMaskHasPlane(sov.so_pmask, pNum)) continue;
-		    sov.so_pmask &= ~(PlaneNumToMaskBit(pNum));
-		    if (sov.so_pmask == 0)
-		    {
-			(void) DBSrPaintArea((Tile *) NULL,
-			    extOverlapDef->cd_planes[pNum], &sov.so_clip,
-			    &sov.so_tmask, extSubtractSideOverlap, (ClientData) &sov);
-		    }
-		    else
-		    {
-			(void) DBSrPaintArea((Tile *) NULL,
-			    extOverlapDef->cd_planes[pNum], &sov.so_clip,
-			    &DBAllTypeBits,
-			    extSubtractSideOverlap2, (ClientData) &sov);
-		    }
-		    break;
-		}
-	    }
-	    if (rtp != rbp)
-	    {
-		efflength = (cfrac - sov.so_coupfrac) * (double)length;
-		cap += e->ec_cap * efflength;
+            if (sov.so_pmask)
+            {
+                sov.so_tmask = e->ec_far;  /* Actually shieldtypes. */
+                for (pNum = PL_TECHDEPBASE; pNum < DBNumPlanes; pNum++)
+                {
+                    /* Each call to DBSrPaintArea has an opportunity to
+                     * subtract a partial capacitance from the total.
+                     */
+                    if (!PlaneMaskHasPlane(sov.so_pmask, pNum)) continue;
+                    sov.so_pmask &= ~(PlaneNumToMaskBit(pNum));
+                    if (sov.so_pmask == 0)
+                    {
+                        (void) DBSrPaintArea((Tile *) NULL,
+                            extOverlapDef->cd_planes[pNum], &sov.so_clip,
+                            &sov.so_tmask, extSubtractSideOverlap, (ClientData) &sov);
+                    }
+                    else
+                    {
+                        (void) DBSrPaintArea((Tile *) NULL,
+                            extOverlapDef->cd_planes[pNum], &sov.so_clip,
+                            &DBAllTypeBits,
+                            extSubtractSideOverlap2, (ClientData) &sov);
+                    }
+                    break;
+                }
+            }
+            if (rtp != rbp)
+            {
+                efflength = (cfrac - sov.so_coupfrac) * (double)length;
+                cap += e->ec_cap * efflength;
 
-		subfrac += sov.so_subfrac;	/* Just add the shielded fraction */
-            
-#if CAP_DEBUG
-        fprintf(stderr,
-                "CapDebug (extSideOverlapHalo): efflength=%g µm, "
-                "cap+=%g aF, cap=%g aF, e->ec_cap=%g, so_coupfrac=%g, "
-                "subfrac+=%g, subfrac=%g, so_subfrac=%g\n",
-                efflength / 200.0,
-                e->ec_cap * efflength / 200.0, cap, e->ec_cap, sov.so_coupfrac,
-                subfrac - sov.so_subfrac, subfrac, sov.so_subfrac);
-        fflush(stderr);
-#endif
+                subfrac += sov.so_subfrac;	/* Just add the shielded fraction */
+                    
+        #if CAP_DEBUG
+                fprintf(stderr,
+                        "CapDebug (extSideOverlapHalo): efflength=%g µm, "
+                        "cap+=%g aF, cap=%g aF, e->ec_cap=%g, so_coupfrac=%g, "
+                        "subfrac+=%g, subfrac=%g, so_subfrac=%g\n",
+                        efflength / 200.0,
+                        e->ec_cap * efflength / 200.0, cap, e->ec_cap, sov.so_coupfrac,
+                        subfrac - sov.so_subfrac, subfrac, sov.so_subfrac);
+                fflush(stderr);
+        #endif
 
-	    }
-	}
+            }
+        }
     }
 
     /* Add in the new capacitance. */
 
     if (tb != TT_SPACE)
     {
-	int oa = ExtCurStyle->exts_planeOrder[esws->plane_of_boundary];
-	int ob = ExtCurStyle->exts_planeOrder[esws->plane_checked];
-	if (oa > ob)
-	{
-	    /* If the overlapped tile is between the substrate and the boundary
-	     * tile, then we subtract the fringe substrate capacitance
-	     * from rbp's region due to the area of the sideoverlap, since
-	     * we now know it is shielded from the substrate.
-	     */
-	    TileType outtype = TiGetType(bp->b_outside);
+        int oa = ExtCurStyle->exts_planeOrder[esws->plane_of_boundary];
+        int ob = ExtCurStyle->exts_planeOrder[esws->plane_checked];
+        if (oa > ob)
+        {
+            /* If the overlapped tile is between the substrate and the boundary
+             * tile, then we subtract the fringe substrate capacitance
+             * from rbp's region due to the area of the sideoverlap, since
+             * we now know it is shielded from the substrate.
+             */
+            TileType outtype = TiGetType(bp->b_outside);
 
-	    /* Decompose contacts into their residues */
-	    if (DBIsContact(ta))
-		ta = DBPlaneToResidue(ta, esws->plane_of_boundary);
-	    if (DBIsContact(outtype))
-		outtype = DBPlaneToResidue(outtype, esws->plane_of_boundary);
+            /* Decompose contacts into their residues */
+            if (DBIsContact(ta))
+                ta = DBPlaneToResidue(ta, esws->plane_of_boundary);
+            if (DBIsContact(outtype))
+                outtype = DBPlaneToResidue(outtype, esws->plane_of_boundary);
 
-	    efflength = (sfrac - subfrac) * (double)length;
-	    subcap = ExtCurStyle->exts_perimCap[ta][0] * efflength;
-	    rbp->nreg_cap -= subcap;
-	    /* Ignore residual error at ~zero zeptoFarads.  Probably	*/
-	    /* there should be better handling of round-off here.	*/
-        if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
-            CapValue substr = -rbp->nreg_cap;
-            rbp->nreg_cap = 0;
+            efflength = (sfrac - subfrac) * (double)length;
+            subcap = ExtCurStyle->exts_perimCap[ta][0] * efflength;
+            rbp->nreg_cap -= subcap;
+            /* Ignore residual error at ~zero zeptoFarads.  Probably	*/
+            /* there should be better handling of round-off here.	*/
+            if ((rbp->nreg_cap > -0.001) && (rbp->nreg_cap < 0.001)) {
+                CapValue substr = -rbp->nreg_cap;
+                rbp->nreg_cap = 0;
 #if CAP_DEBUG
-            extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
+                extNregAdjustCap(rbp, substr, "obsolete_perimcap (residual)");
 #endif
-        }
+            }
 #if CAP_DEBUG
-        extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
+            extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
 #endif
     	}
-    else {
+        else {
 #if CAP_DEBUG
-        extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
+            extNregAdjustCap(rbp, 0.0, "obsolete_perimcap (skipped, wrong direction)");
 #endif
-    }
-	/* If the nodes are electrically connected, then we don't add	*/
-	/* any side overlap capacitance to the node.			*/
-	if (rtp == rbp) return 0;
+        }
+        /* If the nodes are electrically connected, then we don't add	*/
+        /* any side overlap capacitance to the node.			*/
+        if (rtp == rbp) return 0;
     	if (rtp == (NodeRegion *)CLIENTDEFAULT) return 0;
     	if (rbp == (NodeRegion *)CLIENTDEFAULT) return 0;
 
-	if (rtp < rbp)
-	{
-	    ck.ck_1 = rtp;
-	    ck.ck_2 = rbp;
-	}
-	else
-	{
-	    ck.ck_1 = rbp;
-	    ck.ck_2 = rtp;
-	}
-	he = HashFind(extCoupleHashPtr, (char *) &ck);
-    extSetCapValue(he, cap + extGetCapValue(he));
+        if (rtp < rbp)
+        {
+            ck.ck_1 = rtp;
+            ck.ck_2 = rbp;
+        }
+        else
+        {
+            ck.ck_1 = rbp;
+            ck.ck_2 = rtp;
+        }
+        he = HashFind(extCoupleHashPtr, (char *) &ck);
+        extSetCapValue(he, cap + extGetCapValue(he));
 #if CAP_DEBUG
-	extAdjustCouple(he, cap, "sideoverlaphalo");
+        extAdjustCouple(he, cap, "sideoverlaphalo");
 #endif
     }
     return (0);
@@ -1492,9 +1492,10 @@ extSideOverlap(tp, esws)
 		    break;
 		}
 	    }
-	    if (rtp != rbp)
-		cap += e->ec_cap * ov.o_area;
-
+        if (rtp != rbp) {
+            cap += e->ec_cap * ov.o_area;
+        }
+            
 	    areaAccountedFor += ov.o_area;
 	}
     }
