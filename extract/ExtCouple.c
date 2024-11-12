@@ -1347,6 +1347,22 @@ extSideOverlapHalo(tp, esws)
 #endif
             }
 #if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extSideOverlapHalo/obsolete_perimcap) "
+                    "layer %s(%d), net %s, \n"
+                    "\tefflength=%g µm (%g) = "
+                    "(sfrac(%g) - subfrac(%g)) * length(%g µm)\n"
+                    "\texts_perimCap[%s][0] = %g\n"
+                    "\tnreg_cap -= %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(ta), ta, extNodeName((LabRegion *)rbp),
+                    efflength / DB_TO_um, efflength,
+                    sfrac, subfrac, length / DB_TO_um,
+                    DBTypeShortName(ta), ExtCurStyle->exts_perimCap[ta][0],
+                    subcap / 1000.0,
+                    rbp->nreg_cap / 1000.0);
+            fflush(stderr);
+
             extNregAdjustCap(rbp, -subcap, "obsolete_perimcap");
 #endif
     	}
@@ -1377,6 +1393,11 @@ extSideOverlapHalo(tp, esws)
         extAdjustCouple(he, cap, "sideoverlaphalo");
 #endif
     }
+#if CAP_DEBUG
+        fprintf(stderr,
+                "CapDebug ---\n");
+        fflush(stderr);
+#endif
     return (0);
 }
 

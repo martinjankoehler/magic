@@ -626,9 +626,12 @@ extSetResist(reg)
             float perim_um = perim / DB_TO_um;
             float area_um2 = (float)area / (DB_TO_um * DB_TO_um);
             fprintf(stderr,
-                    "CapDebug extSetResult: %s "
+                    "CapDebug (extSetResist): %s "
                     "area=%d (%.12g µm^2) perim=%d (%.12g µm)\n",
                     name, area, area_um2, perim, perim_um);
+            fprintf(stderr,
+                    "CapDebug ---\n");
+            fflush(stderr);
         }
 #endif
         
@@ -4681,6 +4684,19 @@ extNodeAreaFunc(tile, arg)
 	    extResistArea[resistClass] += area;
 	reg->nreg_cap += area * ExtCurStyle->exts_areaCap[residue];
 
+#if CAP_DEBUG
+    const float DB_TO_um = 200.0;
+    fprintf(stderr,
+            "CapDebug (extNodeAreaFunc/Area) "
+            "layer %s(%d), net %s, "
+            "area=%d (%g µm^2) "
+            "nreg_cap += %g fF\n",
+            DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+            area, area / DB_TO_um / DB_TO_um,
+            area * ExtCurStyle->exts_areaCap[residue] / 1000.0);
+    fflush(stderr);
+#endif
+        
 	/* Compute perimeter of nonManhattan edges */
 	if (IsSplit(tile))
 	{
@@ -4699,6 +4715,19 @@ extNodeAreaFunc(tile, arg)
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
         if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
             reg->nreg_cap += capval * len;
+#if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extNodeAreaFunc/NonManhattanPerimeter) "
+                    "layer %s(%d), net %s, "
+                    "non-manhattan length=%d (%g µm) "
+                    "nreg_cap += %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+                    len, len / DB_TO_um,
+                    capval * len / 1000.0,
+                    reg->nreg_cap / 1000.0);
+            fflush(stderr);
+#endif
         }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
 		extResistPerim[resistClass] += len;
@@ -4752,6 +4781,19 @@ topside:
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
         if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
             reg->nreg_cap += capval * len;
+#if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extNodeAreaFunc/Perimeter/TopSide) "
+                    "layer %s(%d), net %s, "
+                    "length=%d (%g µm), "
+                    "nreg_cap += %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+                    len, len / DB_TO_um,
+                    capval * len / 1000.0,
+                    reg->nreg_cap / 1000.0);
+            fflush(stderr);
+#endif
         }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
 		extResistPerim[resistClass] += len;
@@ -4798,6 +4840,19 @@ leftside:
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
         if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
             reg->nreg_cap += capval * len;
+#if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extNodeAreaFunc/Perimeter/LeftSide) "
+                    "layer %s(%d), net %s, "
+                    "length=%d (%g µm), "
+                    "nreg_cap += %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+                    len, len / DB_TO_um,
+                    capval * len / 1000.0,
+                    reg->nreg_cap / 1000.0);
+            fflush(stderr);
+#endif
         }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
             extResistPerim[resistClass] += len;
@@ -4845,6 +4900,19 @@ bottomside:
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
         if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
             reg->nreg_cap += capval * len;
+#if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extNodeAreaFunc/Perimeter/BottomSide) "
+                    "layer %s(%d), net %s, "
+                    "length=%d (%g µm), "
+                    "nreg_cap += %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+                    len, len / DB_TO_um,
+                    capval * len / 1000.0,
+                    reg->nreg_cap / 1000.0);
+            fflush(stderr);
+#endif
         }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
             extResistPerim[resistClass] += len;
@@ -4891,6 +4959,19 @@ rightside:
 	    tres = (DBIsContact(t)) ? DBPlaneToResidue(t, tilePlaneNum) : t;
         if ((capval = ExtCurStyle->exts_perimCap[residue][tres]) != (CapValue) 0) {
             reg->nreg_cap += capval * len;
+#if CAP_DEBUG
+            const float DB_TO_um = 200.0;
+            fprintf(stderr,
+                    "CapDebug (extNodeAreaFunc/Perimeter/RightSide) "
+                    "layer %s(%d), net %s, "
+                    "length=%d (%g µm), "
+                    "nreg_cap += %g fF (now nreg_cap = %g fF)\n",
+                    DBTypeShortName(type), type, extNodeName((LabRegion *)reg),
+                    len, len / DB_TO_um,
+                    capval * len / 1000.0,
+                    reg->nreg_cap / 1000.0);
+            fflush(stderr);
+#endif
         }
 	    if (TTMaskHasType(resMask, tres) && resistClass != -1)
             extResistPerim[resistClass] += len;
