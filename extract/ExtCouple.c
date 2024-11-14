@@ -1001,9 +1001,9 @@ extRemoveSubcap(bp, clip, esws)
     rbp = (NodeRegion *)extGetRegion(bp->b_inside);
 
     if (bp->b_segment.r_xtop == bp->b_segment.r_xbot)
-	length = bp->b_segment.r_ytop - bp->b_segment.r_ybot;
+        length = bp->b_segment.r_ytop - bp->b_segment.r_ybot;
     else
-	length = bp->b_segment.r_xtop - bp->b_segment.r_xbot;
+        length = bp->b_segment.r_xtop - bp->b_segment.r_xbot;
 
     switch (bp->b_direction)
     {
