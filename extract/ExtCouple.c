@@ -2286,15 +2286,32 @@ extSideCommon(rinside, rfar, tpnear, tpfar, overlap, sep, extCoupleList)
     he = HashFind(extCoupleHashPtr, (char *) &ck);
 
     cap = extGetCapValue(he);
-    for (e = extCoupleList; e; e = e->ec_next)
-	if (TTMaskHasType(&e->ec_near, near) && TTMaskHasType(&e->ec_far, far)) {
-	    cap += (e->ec_cap * overlap) / (sep + e->ec_offset);
-        extSetCapValue(he, cap);
+    for (e = extCoupleList; e; e = e->ec_next) {
+        if (TTMaskHasType(&e->ec_near, near) && TTMaskHasType(&e->ec_far, far)) {
+            cap += (e->ec_cap * overlap) / (sep + e->ec_offset);
+            extSetCapValue(he, cap);
 #if CAP_DEBUG
-		extAdjustCouple(he,
-			(e->ec_cap * overlap) / (sep + e->ec_offset),
-			"sidewall");
+            {
+                const float DB_TO_um = 200.0;
+                CoupleKey *dbg_ck = he->h_key.h_words;
+                
+                fprintf(stderr,
+                        "CapDebug (sidewall): %s-%s (layer %s), "
+                        "overlap=%d (%g µm), sep=%d (%g µm), e->ec_cap=%g (%g fF), e->ec_offset=%d (%g µm), "
+                        "delta += %g fF …\tnow is %g fF\n",
+                        extNodeName((LabRegion *)dbg_ck->ck_1), extNodeName((LabRegion *)dbg_ck->ck_2),
+                        DBTypeShortName(rinside->nreg_type),
+                        overlap, overlap / DB_TO_um, sep, sep / DB_TO_um,
+                        e->ec_cap, e->ec_cap * 2 / 1000.0, e->ec_offset, e->ec_offset / DB_TO_um,
+                        (e->ec_cap * overlap) / (sep + e->ec_offset) / 1000.0,
+                        cap / 1000.0
+                        );
+            }
+    //		extAdjustCouple(he,
+    //			(e->ec_cap * overlap) / (sep + e->ec_offset),
+    //			"sidewall");
 #endif
-	}
+        }
+    }
 }
 
