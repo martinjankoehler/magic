@@ -258,14 +258,38 @@ ResCalcEastWest(tile, pendingList, doneList, resList)
 	    resistor->rr_csArea = height *
 				ExtCurStyle->exts_thick[resistor->rr_tt];
 #endif
-	    resistor->rr_value =
-			(float)ExtCurStyle->exts_sheetResist[resistor->rr_tt]
-			* (float)(p2->br_loc.p_x - p1->br_loc.p_x)
-			/ (float)height;
-	    rArea = ((p2->br_loc.p_x - p1->br_loc.p_x) * height) / 2;
-	    resistor->rr_connection1->rn_float.rn_area += rArea;
-	    resistor->rr_connection2->rn_float.rn_area += rArea;
-	    resistor->rr_float.rr_area = 0;
+       resistor->rr_value =
+           (float)ExtCurStyle->exts_sheetResist[resistor->rr_tt]
+           * (float)(p2->br_loc.p_x - p1->br_loc.p_x)
+           / (float)height;
+       rArea = ((p2->br_loc.p_x - p1->br_loc.p_x) * height) / 2;
+       resistor->rr_connection1->rn_float.rn_area += rArea;
+       resistor->rr_connection2->rn_float.rn_area += rArea;
+       resistor->rr_float.rr_area = 0;
+
+#if PEX_RES_DEBUG
+       {
+           const float DB_TO_um = 200.0;
+           fprintf(stderr,
+                   "ResCalcEastWest: %s (%g, %g) <-> %s (%g, %g) @ %s\n"
+                   "\texts_sheetResist[%s]=%g, length=%g, height=%g, "
+                   "resistor->rr_value = %g mΩ\n",
+                   resistor->rr_node[0]->rn_name,
+                   resistor->rr_node[0]->rn_loc.p_x / DB_TO_um,
+                   resistor->rr_node[0]->rn_loc.p_y / DB_TO_um,
+                   resistor->rr_node[1]->rn_name,
+                   resistor->rr_node[1]->rn_loc.p_x / DB_TO_um,
+                   resistor->rr_node[1]->rn_loc.p_y / DB_TO_um,
+                   DBTypeShortName(resistor->rr_tt),
+                   DBTypeShortName(resistor->rr_tt),
+                   (float)ExtCurStyle->exts_sheetResist[resistor->rr_tt],
+                   (p2->br_loc.p_x - p1->br_loc.p_x) / DB_TO_um,
+                   height / DB_TO_um,
+                   resistor->rr_value
+                   );
+           fflush(stderr);
+       }
+#endif
 
 	    freeMagic((char *)p1);
 	}
@@ -434,6 +458,31 @@ ResCalcNorthSouth(tile, pendingList, doneList, resList)
 	    resistor->rr_connection1->rn_float.rn_area += rArea;
 	    resistor->rr_connection2->rn_float.rn_area += rArea;
 	    resistor->rr_float.rr_area = 0;
+
+#if PEX_RES_DEBUG
+       {
+           const float DB_TO_um = 200.0;
+           fprintf(stderr,
+                   "ResCalcNorthSouth: %s (%g, %g) <-> %s (%g, %g) @ %s\n"
+                   "\texts_sheetResist[%s]=%g, length=%g, width=%g, "
+                   "resistor->rr_value = %g mΩ\n",
+                   resistor->rr_node[0]->rn_name,
+                   resistor->rr_node[0]->rn_loc.p_x / DB_TO_um,
+                   resistor->rr_node[0]->rn_loc.p_y / DB_TO_um,
+                   resistor->rr_node[1]->rn_name,
+                   resistor->rr_node[1]->rn_loc.p_x / DB_TO_um,
+                   resistor->rr_node[1]->rn_loc.p_y / DB_TO_um,
+                   DBTypeShortName(resistor->rr_tt),
+                   DBTypeShortName(resistor->rr_tt),
+                   (float)ExtCurStyle->exts_sheetResist[resistor->rr_tt],
+                   (p2->br_loc.p_x - p1->br_loc.p_x) / DB_TO_um,
+                   width / DB_TO_um,
+                   resistor->rr_value
+                   );
+           fflush(stderr);
+       }
+#endif
+        
 	    freeMagic((char *)p1);
 	}
     }
@@ -789,6 +838,10 @@ ResDoContacts(contact, nodes, resList)
     minside = CIFGetContactSize(contact->cp_type, &viawidth, &spacing, &border);
     cscale = CIFCurStyle->cs_scaleFactor;
 
+#if PEX_RES_DEBUG
+    int viawidth_orig = viawidth; // NOTE: copying original value, as viawidth will be modified
+#endif
+    
     if ((ExtCurStyle->exts_viaResist[contact->cp_type] == 0) || (viawidth == 0))
     {
 	int x = contact->cp_center.p_x;
@@ -906,6 +959,38 @@ ResDoContacts(contact, nodes, resList)
 		resistor->rr_tt = contact->cp_type;
 		resistor->rr_float.rr_area = 0;
 		resistor->rr_status = 0;
+            
+#if PEX_RES_DEBUG
+           {
+               const float DB_TO_um = 200.0;
+               fprintf(stderr,
+                       "ResDoContacts: %s (%g, %g) <-> %s (%g, %g) @ %s\n"
+                       "\tW = %g µm, H = %g µm\n"
+                       "\texts_viaResist[%s]=%g, viawidth=%g µm, spacing=%g µm, border=%g µm\n"
+                       "\tsquaresx=%d, squaresy=%d, "
+                       "resistor->rr_value = %g mΩ\n",
+                       resistor->rr_node[0]->rn_name,
+                       resistor->rr_node[0]->rn_loc.p_x / DB_TO_um,
+                       resistor->rr_node[0]->rn_loc.p_y / DB_TO_um,
+                       resistor->rr_node[1]->rn_name,
+                       resistor->rr_node[1]->rn_loc.p_x / DB_TO_um,
+                       resistor->rr_node[1]->rn_loc.p_y / DB_TO_um,
+                       DBTypeShortName(resistor->rr_tt),
+                       contact->cp_width / DB_TO_um,
+                       contact->cp_height / DB_TO_um,
+                       DBTypeShortName(resistor->rr_tt),
+                       (float)ExtCurStyle->exts_viaResist[resistor->rr_tt],
+                       ((float)viawidth_orig / cscale) / DB_TO_um,
+                       ((float)spacing / cscale) / DB_TO_um,
+                       ((float)border / cscale) / DB_TO_um,
+                       squaresx,
+                       squaresy,
+                       resistor->rr_value
+                       );
+               fflush(stderr);
+           }
+#endif
+
 	    }
 	}
     }
