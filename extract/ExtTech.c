@@ -3291,6 +3291,18 @@ ExtTechLine(sectionName, argc, argv)
 		return (TRUE);
 	    break;
 	case SIDEWALL:
+
+	    /* NOTE:  Originally, the sidewall capacitance coefficient was
+	     * supposed to be the value that is appropriate to compute
+	     * half the total sidewall on each edge.  The addition of "offset"
+	     * requires that the coefficient (and offset) should be values
+	     * yielding the total sidewall between two edges.  Because each
+	     * edge is computed separately, the total capacitance is halved
+	     * when doing the calculation (see ExtCouple.c).  Sidewall values
+	     * are correct for the open PDKs and presumably incorrect for the
+	     * original SCMOS tech files.
+	     */
+
 	    DBTechNoisyNameMask(argv[2], &types2);
 	    TTMaskSetMask(allExtractTypes, &types2);
 	    DBTechNoisyNameMask(argv[3], &near);
