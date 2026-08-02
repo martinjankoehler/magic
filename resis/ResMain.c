@@ -1717,7 +1717,7 @@ FindStartTile(resisdata, SourcePoint)
 	TileType rtype;
 
 	for (rtype = TT_TECHDEPBASE; rtype < DBNumUserLayers; rtype++)
-	    if (TTMaskHasType(rmask, rtype))
+	    if (TTMaskHasType(rmask, rtype) && (rtype != savtype))
 	    {
 		resisdata->rg_ttype = rtype;
 		if ((tile = FindStartTile(resisdata, SourcePoint)) != NULL)
