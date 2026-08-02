@@ -3099,7 +3099,7 @@ extSideCommon(rinside, rfar, tpnear, tpfar, bdir, overlap, sep, extCoupleList)
     cap = extGetCapValue(he);
     for (e = extCoupleList; e; e = e->ec_next)
 	if (TTMaskHasType(&e->ec_near, near) && TTMaskHasType(&e->ec_far, far)) {
-	    swcap = 0.5 * (e->ec_cap * overlap) / (sep + e->ec_offset);
+	    swcap = (e->ec_cap * overlap) / (sep + e->ec_offset);
 	    cap += swcap;
 	    if (CAP_DEBUG)
 		extAdjustCouple(he, swcap, "sidewall");
